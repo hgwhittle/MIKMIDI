@@ -27,7 +27,14 @@
 	MIDIEndpointRef midiOut;
 	
 	MIDIClientCreate((__bridge CFStringRef)name, NULL, NULL, &midiClient);
-	OSStatus err = MIDISourceCreate(midiClient, (__bridge CFStringRef)name, &midiOut);
+	
+	OSStatus err;
+	if (@available(iOS 14.0, *)) {
+		err = MIDISourceCreateWithProtocol(midiClient, (__bridge CFStringRef)name, kMIDIProtocol_1_0, &midiOut);
+	} else {
+		err = MIDISourceCreate(midiClient, (__bridge CFStringRef)name, &midiOut);
+	}
+	
 	if (err != noErr) {
 		NSLog(@"%s failed. Unable to create MIDISource.", __PRETTY_FUNCTION__);
 #if TARGET_OS_IPHONE
